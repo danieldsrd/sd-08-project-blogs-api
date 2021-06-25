@@ -6,10 +6,10 @@ const jwtConfig = {
 };
 
 const secret = 'senhadificil';
-const createToken = ({ displayName, email, password, image }) => {
-  const token = jwt.sign({ displayName, email, password, image }, secret, jwtConfig);
+const createToken = (result) => {
+  const token = jwt.sign(result, secret, jwtConfig);
 
   return token;
-}
+};
 
 module.exports = createToken;
