@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-const secret = 'senhadificil';
+const secret = process.env.JWT_SECRET;
 
 const STATUS_ERROR = 401;
 
