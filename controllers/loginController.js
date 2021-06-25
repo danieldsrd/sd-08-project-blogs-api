@@ -1,6 +1,6 @@
 const express = require('express');
 const { User } = require('../models');
-const createToken = require('../middlewares/validateJWT');
+const createToken = require('../services/createJWT');
 const { emailPassValidate } = require('../services/loginValidate');
 
 const router = express.Router();
@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
         if (!userLogin) {
           return res.status(400).json({ message: 'Invalid fields' });
         } 
-          const token = createToken(req.body);        
+          const token = createToken(req.body);
           return res.status(200).json({ token });
       })
       .catch((err) => res.status(400).json({ message: err.errors[0].message }));  

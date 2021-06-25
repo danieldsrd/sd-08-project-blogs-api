@@ -1,6 +1,7 @@
 const express = require('express');
 const { User } = require('../models');
-const createToken = require('../middlewares/validateJWT');
+const createToken = require('../services/createJWT');
+const { validateJWT } = require('../middlewares/validateJWT');
 
 const router = express.Router();
 
@@ -17,6 +18,16 @@ router.post('/', async (req, res) => {
         return res.status(409).json({ message: 'User already registered' });
       }     
       return res.status(400).json({ message: err.errors[0].message });     
+    });
+});
+
+router.get('/', validateJWT, async (req, res) => {
+  User.findAll()
+    .then((users) => {
+      res.status(200).json(users);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err.errors[0].message });
     });
 });
 
