@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
       if (err.errors[0].validatorKey === 'not_unique') {
         return res.status(409).json({ message: 'User already registered' });
       }     
-      return res.status(400).json({ message: err.errors[0].message });     
+      return res.status(400).json({ message: err.errors[0].message });
     });
 });
 
