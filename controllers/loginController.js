@@ -8,7 +8,9 @@ const router = express.Router();
 router.post('/', async (req, res) => {
   const { email, password } = req.body;
   const { code, message } = emailPassValidate(email, password);
-  if (!code && !message) {
+  if (code !== undefined && message !== undefined) {
+    res.status(code).json({ message });
+  }
     User.findOne({
       where: { email, password },
     }).then((userLogin) => {
@@ -18,9 +20,7 @@ router.post('/', async (req, res) => {
           const token = createToken(req.body);
           return res.status(200).json({ token });
       })
-      .catch((err) => res.status(400).json({ message: err.errors[0].message }));  
-  }
-  return res.status(code).json({ message });
+      .catch((_err) => res.status(400).send({ message: 'Error' })); 
 });
 
 module.exports = router;
