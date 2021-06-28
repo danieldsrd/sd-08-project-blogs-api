@@ -9,8 +9,14 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       categoryId: {
-        allowNull: false,
         type: Sequelize.INTEGER,
+        allowNull: false,
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Categories',
+          key: 'id',
+        },
       }
     })
   },
