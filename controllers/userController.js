@@ -37,13 +37,11 @@ router.get('/:id', validateJWT, async (req, res) => {
   User.findByPk(id)
     .then((user) => {
       if (user === null) {
-        res.status(404).json({ message: 'User does not exist' });
+        return res.status(404).json({ message: 'User does not exist' });
       }
-      res.status(200).json(user);
+      return res.status(200).json(user);
   })
-    .catch((err) => {
-      res.status(500).json({ message: err.errors[0].message });
-    });
+    .catch(() => res.status(500).json({ message: 'Error' }));
 });
 
 module.exports = router;
