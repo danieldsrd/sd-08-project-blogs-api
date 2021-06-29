@@ -44,4 +44,14 @@ router.get('/:id', validateJWT, async (req, res) => {
     .catch(() => res.status(500).json({ message: 'Error' }));
 });
 
+router.delete('/me', validateJWT, async (req, res) => {
+  const reqUser = req.user.id;
+  try {
+    const deletedUser = await User.destroy({ where: { id: reqUser } });
+    if (deletedUser === 1) return res.status(204).end();
+  } catch (e) {
+    res.status(400).send({ message: 'error' });
+  }
+});
+
 module.exports = router;
