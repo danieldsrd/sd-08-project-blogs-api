@@ -1,7 +1,11 @@
 const express = require('express');
+const Sequelize = require('sequelize');
+
+const { Op } = Sequelize;
 const { BlogPost, Category, User } = require('../models');
 const { validateJWT } = require('../middlewares/validateJWT');
 const { validatePostUser } = require('../services/putPostValidate');
+const functionSearch = require('../middlewares/searchPost');
 
 const router = express.Router();
 
@@ -45,6 +49,22 @@ router.get('/', validateJWT, async (req, res) => {
       });
     }));
     res.status(200).json(findByIds);
+  } catch (e) {
+    res.status(400).send({ message: 'error' });
+  }
+});
+
+router.get('/search', validateJWT, async (req, res) => {
+  const { q } = req.query;
+  try {
+    const posts = await BlogPost.findAll({ where: {
+      [Op.or]: [
+        { title: { [Op.like]: `%${q}%` } },
+        { content: { [Op.like]: `%${q}%` } },
+      ],
+    } });
+    const result = await functionSearch(posts);
+    res.status(200).json(result);
   } catch (e) {
     res.status(400).send({ message: 'error' });
   }
