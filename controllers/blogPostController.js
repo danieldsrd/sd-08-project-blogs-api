@@ -1,6 +1,7 @@
 const express = require('express');
 const { BlogPost, Category, User } = require('../models');
 const { validateJWT } = require('../middlewares/validateJWT');
+const { validatePostUser } = require('../services/putPostValidate');
 
 const router = express.Router();
 
@@ -65,6 +66,27 @@ router.get('/:id', validateJWT, async (req, res) => {
       categories: [{ ...categoryById.dataValues }],
     };
     return res.status(200).json(result);
+  } catch (e) {
+    res.status(400).send({ message: 'error' });
+  }
+});
+
+router.put('/:id', validateJWT, async (req, res) => {
+  const reqUser = req.user.id;
+  const { id } = req.params;
+  const { title, content, categoryIds } = req.body;
+  try {
+    const post = await BlogPost.findByPk(id, { raw: true });
+    if (post.userId !== reqUser) return res.status(401).json({ message: 'Unauthorized user' });
+    const { code, message } = validatePostUser(categoryIds, title, content);
+    if (code && message) return res.status(code).json({ message });
+    await BlogPost.update({ title, content }, { where: { id } });
+    const postUpdated = await BlogPost.findByPk(id, {
+      attributes: { exclude: ['updated', 'createAt', 'published', 'id'] },
+    });
+    const categoryById = await Category.findOne({ where: { id: post.id } });
+    const result = { ...postUpdated.dataValues, categories: [{ ...categoryById.dataValues }] };
+    res.status(200).json(result);
   } catch (e) {
     res.status(400).send({ message: 'error' });
   }
