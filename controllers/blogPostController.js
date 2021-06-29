@@ -92,4 +92,18 @@ router.put('/:id', validateJWT, async (req, res) => {
   }
 });
 
+router.delete('/:id', validateJWT, async (req, res) => {
+  const reqUser = req.user.id;
+  const { id } = req.params;
+  try {
+    const post = await BlogPost.findByPk(id, { raw: true });
+    if (!post) return res.status(404).json({ message: 'Post does not exist' });
+    if (post.userId !== reqUser) return res.status(401).json({ message: 'Unauthorized user' });
+    const deletedPost = await BlogPost.destroy({ where: { id } });
+    if (deletedPost === 1) return res.status(204).end();
+  } catch (e) {
+    res.status(400).send({ message: 'error' });
+  }
+});
+
 module.exports = router;
