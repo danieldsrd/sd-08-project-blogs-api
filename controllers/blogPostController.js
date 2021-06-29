@@ -49,4 +49,25 @@ router.get('/', validateJWT, async (req, res) => {
   }
 });
 
+router.get('/:id', validateJWT, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await BlogPost.findByPk(id);
+    if (!post) return res.status(404).json({ message: 'Post does not exist' });
+    const userById = await User.findOne({ 
+      where: { id: post.dataValues.userId },
+      attributes: { exclude: ['password'] },
+    });      
+    const categoryById = await Category.findOne({ where: { id: post.dataValues.id } });      
+    const result = {
+      ...post.dataValues,
+      user: { ...userById.dataValues },
+      categories: [{ ...categoryById.dataValues }],
+    };
+    return res.status(200).json(result);
+  } catch (e) {
+    res.status(400).send({ message: 'error' });
+  }
+});
+
 module.exports = router;
